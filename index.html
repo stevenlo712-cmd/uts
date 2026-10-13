@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+        <!--login-->
     <main class="halaman-login" id="halamanLogin">
         <section class="kartu-login">
             <p class="label-atas">SISTEM SEKOLAH</p>
@@ -26,13 +27,13 @@
     <main class="aplikasi" id="aplikasi" hidden>
         <aside class="sidebar">
             <div class="brand">
-                <div class="logo kecil">AS</div>
+                <!--<div class="logo kecil">An</div>-->
                 <div>
                     <strong>Absensi Siswa</strong>
                     <span>Panel siswa</span>
                 </div>
             </div>
-
+                <!--dashboard-->
             <div class="menu-aktif">Dashboard</div>
             <div class="info-sidebar">
                 <span class="bulat-online"></span>
@@ -43,7 +44,7 @@
             </div>
             <button class="tombol-keluar" id="tombolLogout">Keluar akun</button>
         </aside>
-
+            <!--bagian dalam dashboard-->
         <section class="konten">
             <header class="header">
                 <div>
@@ -62,7 +63,7 @@
 
             <section class="ringkasan">
                 <article class="kartu-ringkasan">
-                    <!--<div class="ikon ikon-biru">▤</div>-->
+                    <!--<div class="ikon ikon-biru"></div>-->
                     <div>
                         <p>Total absensi saya</p>
                         <h2 id="jumlahAbsensi">0</h2>
@@ -87,7 +88,7 @@
                     </div>
                     <span class="label-wajib">* Wajib diisi</span>
                 </div>
-
+                    <!--kolom absen-->
                 <form id="formAbsensi">
                     <div class="grid-form">
                         <div class="kolom-form">
@@ -96,7 +97,7 @@
                         </div>
                         <div class="kolom-form">
                             <label for="kelas">Kelas</label>
-                            <input type="text" id="kelas" maxlength="30" placeholder="Contoh: XI RPL" required>
+                            <input type="text" id="kelas" maxlength="30" placeholder="Kelas & Jurusan" required>
                         </div>
                         <div class="kolom-form">
                             <label for="tanggal">Tanggal absensi</label>
