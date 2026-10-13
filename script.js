@@ -115,7 +115,7 @@ tombolLogout.addEventListener("click", async function() {
     try {
         await signOut(auth);
     } catch (error) {
-        alert("Logout gagal. Periksa koneksi internet.");
+        alert("Logout gagal. silahkan coba lagi.");
     }
 });
 
@@ -123,7 +123,7 @@ function mulaiMendengarAbsensi(uid) {
     if (berhentiMendengar) {
         berhentiMendengar();
     }
-
+    // auto colection
     const daftarSaya = query(collection(db, "absensi"), where("uid", "==", uid));
 
     berhentiMendengar = onSnapshot(daftarSaya, function(snapshot) {
@@ -153,7 +153,7 @@ function tampilkanTabel() {
         daftarAbsensi.innerHTML = '<tr><td colspan="5" class="kosong">Belum ada catatan absensi.</td></tr>';
         return;
     }
-
+// absensi
     daftarAbsensi.innerHTML = "";
 
     dataAbsensi.forEach(function(item) {
@@ -192,7 +192,6 @@ function tampilkanTabel() {
 
 formAbsensi.addEventListener("submit", async function(event) {
     event.preventDefault();
-
     if (!penggunaSekarang) {
         tampilkanPesan(pesanAbsensi, "Silakan login terlebih dahulu.", "error");
         return;
