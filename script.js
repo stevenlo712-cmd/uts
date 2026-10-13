@@ -229,7 +229,7 @@ formAbsensi.addEventListener("submit", async function(event) {
             tampilkanPesan(pesanAbsensi, "Data tidak ditemukan. Muat ulang halaman lalu coba lagi.", "error");
             return;
         }
-
+          // data yang di simpan di firebase
         const dataSimpan = {
             nama: namaIsi,
             kelas: kelasIsi,
@@ -250,7 +250,7 @@ formAbsensi.addEventListener("submit", async function(event) {
         resetFormAbsensi();
     } catch (error) {
         if (error.code === "permission-denied") {
-            tampilkanPesan(pesanAbsensi, "Akses ditolak. Periksa aturan Firestore.", "error");
+            tampilkanPesan(pesanAbsensi, "Akses ditolak.", "error");
         } else {
             tampilkanPesan(pesanAbsensi, "Absensi gagal disimpan. Periksa koneksi internet.", "error");
         }
