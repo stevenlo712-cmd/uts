@@ -1,157 +1,132 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Siswa</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Absensi Siswa</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-        <!--login-->
-    <main class="halaman-login" id="halamanLogin">
-        <section class="kartu-login">
-            <p class="label-atas">SISTEM SEKOLAH</p>
-            <h1>Absensi Siswa</h1>
-            <p class="teks-bantu">Masuk menggunakan akun yang sudah diberikan.</p>
-            <form id="formLogin">
-                <label for="emailLogin">Email</label>
-                <input type="email" id="emailLogin" placeholder="masukan email kamu" autocomplete="username" required>
-                <label for="passwordLogin">Password</label>
-                <input type="password" id="passwordLogin" placeholder="masukkan password kamu" autocomplete="current-password" required>
-                <button type="submit" id="tombolLogin">Masuk</button>
-                <p class="pesan" id="pesanLogin" role="status"></p>
-            </form>
-        </section>
-    </main>
+  <header id="appHeader" class="header" hidden>
+    <h1>Sistem Absensi Siswa</h1>
 
-    <main class="aplikasi" id="aplikasi" hidden>
-        <aside class="sidebar">
-            <div class="brand">
-                <!--<div class="logo kecil">An</div>-->
-                <div>
-                    <strong>Absensi Siswa</strong>
-                    <span>Panel siswa</span>
-                </div>
-            </div>
-                <!--dashboard-->
-            <div class="menu-aktif">Dashboard</div>
-            <div class="info-sidebar">
-                <span class="bulat-online"></span>
-                <div>
-                    <strong>Sistem aktif</strong>
-                    <p>Data tersimpan online</p>
-                </div>
-            </div>
-            <button class="tombol-keluar" id="tombolLogout">Keluar akun</button>
-        </aside>
-            <!--bagian dalam dashboard-->
-        <section class="konten">
-            <header class="header">
-                <div>
-                    <p class="label-atas">DASHBOARD</p>
-                    <h1>Selamat datang</h1>
-                    <p class="teks-bantu">Kelola dan lihat catatan kehadiranmu di sini.</p>
-                </div>
-                <div class="profil">
-                    <div class="avatar" id="inisialPengguna">S</div>
-                    <div>
-                        <strong id="emailPengguna">Pengguna</strong>
-                        <span>Akun siswa</span>
-                    </div>
-                </div>
-            </header>
+    <div class="user-info">
+      <span id="userEmail"></span>
+      <button id="logoutButton" type="button" class="button button-secondary">
+        Keluar
+      </button>
+    </div>
+  </header>
 
-            <section class="ringkasan">
-                <article class="kartu-ringkasan">
-                    <!--<div class="ikon ikon-biru"></div>-->
-                    <div>
-                        <p>Total absensi saya</p>
-                        <h2 id="jumlahAbsensi">0</h2>
-                        <span>Catatan yang tersimpan</span>
-                    </div>
-                </article>
-                <article class="kartu-ringkasan">
-                    <div class="ikon ikon-hijau">✓</div>
-                    <div>
-                        <p>Status hari ini</p>
-                        <h2 class="status-hari-ini" id="statusHariIni">Belum ada</h2>
-                        <span>Absensi berdasarkan tanggal hari ini</span>
-                    </div>
-                </article>
-            </section>
+  <main class="container">
+    <section id="loginSection" class="card">
+      <h2>Login</h2>
 
-            <section class="kartu utama">
-                <div class="judul-bagian">
-                    <div>
-                        <h2>Form absensi</h2>
-                        <p>Isi data kehadiran dengan benar.</p>
-                    </div>
-                    <span class="label-wajib">* Wajib diisi</span>
-                </div>
-                    <!--kolom absen-->
-                <form id="formAbsensi">
-                    <div class="grid-form">
-                        <div class="kolom-form">
-                            <label for="nama">Nama siswa</label>
-                            <input type="text" id="nama" maxlength="80" placeholder="Nama lengkap" required>
-                        </div>
-                        <div class="kolom-form">
-                            <label for="kelas">Kelas</label>
-                            <input type="text" id="kelas" maxlength="30" placeholder="Kelas & Jurusan" required>
-                        </div>
-                        <div class="kolom-form">
-                            <label for="tanggal">Tanggal absensi</label>
-                            <input type="date" id="tanggal" required>
-                        </div>
-                        <div class="kolom-form">
-                            <label for="status">Status kehadiran</label>
-                            <select id="status" required>
-                                <option value="">Pilih status</option>
-                                <option value="Hadir">Hadir</option>
-                                <option value="Izin">Izin</option>
-                                <option value="Sakit">Sakit</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="baris-tombol">
-                        <button type="submit" id="tombolSimpan">Simpan absensi</button>
-                        <button type="button" class="tombol-batal" id="tombolBatal" hidden>Batal edit</button>
-                    </div>
-                    <p class="pesan" id="pesanAbsensi" role="status"></p>
-                </form>
-            </section>
+      <form id="loginForm">
+        <label for="loginRole">Login sebagai</label>
+        <select id="loginRole" required>
+          <option value="siswa">Siswa</option>
+          <option value="guru">Guru</option>
+        </select>
 
-            <section class="kartu tabel-kartu">
-                <div class="judul-bagian">
-                    <div>
-                        <h2>Riwayat absensi</h2>
-                        <p>Data diperbarui otomatis.</p>
-                    </div>
-                    <span class="label-live"><span></span> aktif</span>
-                </div>
+        <label for="loginEmail" >Email</label>
+        <input id="loginEmail" type="email" autocomplete="email"  placeholder="Masukan email." required >
 
-                <div class="pembungkus-tabel">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nama siswa</th>
-                                <th>Kelas</th>
-                                <th>Tanggal</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="daftarAbsensi">
-                            <tr><td colspan="5" class="kosong">Memuat data absensi...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="catatan-tabel">Riwayat yang ditampilkan adalah catatan dari akun yang sedang login.</p>
-            </section>
-            <footer>Absensi Siswa</footer>
-        </section>
-    </main>
+        <label for="loginPassword">Password</label>
+        <input
+          id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukan password."
+        >
 
-    <script type="module" src="script.js"></script>
+        <button type="submit" class="button">Login</button>
+      </form>
+
+      <p id="loginMessage" class="message"></p>
+    </section>
+
+    <section id="studentSection" hidden>
+      <div class="card">
+        <h2>Form Absensi</h2>
+
+        <form id="attendanceForm">
+          <label for="attendanceDate">Tanggal</label>
+          <input id="attendanceDate" type="date" readonly>
+
+          <label for="studentName">Nama</label>
+          <input id="studentName" type="text" maxlength="100" required placeholder="Masukan nama kamu.">
+
+          <label for="studentClass">Kelas</label>
+          <input id="studentClass" type="text" maxlength="50" required placeholder="Masukan kelas kamu.">
+
+          <label for="attendanceReason">Keterangan</label>
+          <select id="attendanceReason" required>
+            <option value="">Pilih keterangan</option>
+            <option value="Hadir">Hadir</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Izin">Izin</option>
+          </select>
+
+          <button id="submitAttendanceButton" type="submit" class="button">
+            Kirim Absensi
+          </button>
+        </form>
+
+        <p id="attendanceMessage" class="message"></p>
+      </div>
+
+      <div class="card">
+        <h2>Ringkasan Absensi</h2>
+
+        <div class="summary">
+          <div>Hadir: <strong id="countHadir">0</strong></div>
+          <div>Sakit: <strong id="countSakit">0</strong></div>
+          <div>Izin: <strong id="countIzin">0</strong></div>
+          <div>Total: <strong id="countTotal">0</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Riwayat Absensi Saya</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="studentHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="teacherSection" hidden>
+      <div class="card">
+        <h2>Data Absensi Siswa</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Email Siswa</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="teacherTableBody"></tbody>
+          </table>
+        </div>
+
+        <p id="teacherMessage" class="message"></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>
