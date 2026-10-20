@@ -1,11 +1,30 @@
+:root {
+  --warna-latar-halaman: #f3f5f8;
+  --warna-teks-utama: #202938;
+  --warna-header: #1d4ed8;
+  --warna-teks-header: #ffffff;
+  --warna-latar-input: #ffffff;
+  --warna-latar-input-readonly: #eef2f7;
+  --warna-batas-input: #cbd5e1;
+  --warna-tombol-kirim: #1d4ed8;
+  --warna-tombol-kirim-saat-disorot: #1e40af;
+  --warna-tombol-sekunder: #334155;
+  --warna-tombol-sekunder-saat-disorot: #1e293b;
+  --warna-latar-ringkasan: #eff6ff;
+  --warna-latar-judul-tabel: #f8fafc;
+  --warna-garis-tabel: #e2e8f0;
+  --warna-teks-versi: #888888;
+  --warna-bayangan-kartu: #00000012;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #f3f5f8;
-  color: #202938;
+  background: var(--warna-latar-halaman);
+  color: var(--warna-teks-utama);
   font-family: Arial, sans-serif;
 }
 
@@ -19,8 +38,8 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 16px 24px;
-  background: #1d4ed8;
-  color: #fff;
+  background: var(--warna-header);
+  color: var(--warna-teks-header);
 }
 
 .header h1 {
@@ -48,8 +67,8 @@ body {
   margin-bottom: 20px;
   padding: 20px;
   border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 2px 10px #00000012;
+  background: var(--warna-latar-input);
+  box-shadow: 0 2px 10px var(--warna-bayangan-kartu);
 }
 
 h2 {
@@ -76,25 +95,25 @@ button {
 input,
 select {
   width: 100%;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--warna-batas-input);
   border-radius: 6px;
-  background: #fff;
+  background: var(--warna-latar-input);
 }
 
 input[readonly] {
-  background: #eef2f7;
+  background: var(--warna-latar-input-readonly);
 }
 
 .button {
   border: 0;
   border-radius: 6px;
-  background: #1d4ed8;
-  color: #fff;
+  background: var(--warna-tombol-kirim);
+  color: var(--warna-teks-header);
   cursor: pointer;
 }
 
 .button:hover {
-  background: #1e40af;
+  background: var(--warna-tombol-kirim-saat-disorot);
 }
 
 .button:disabled {
@@ -104,11 +123,11 @@ input[readonly] {
 
 .button-secondary {
   min-height: 36px;
-  background: #334155;
+  background: var(--warna-tombol-sekunder);
 }
 
 .button-secondary:hover {
-  background: #1e293b;
+  background: var(--warna-tombol-sekunder-saat-disorot);
 }
 
 .message {
@@ -125,7 +144,7 @@ input[readonly] {
 .summary div {
   padding: 12px 16px;
   border-radius: 6px;
-  background: #eff6ff;
+  background: var(--warna-latar-ringkasan);
 }
 
 .table-wrap {
@@ -140,13 +159,13 @@ table {
 th,
 td {
   padding: 10px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--warna-garis-tabel);
   text-align: left;
   vertical-align: top;
 }
 
 th {
-  background: #f8fafc;
+  background: var(--warna-latar-judul-tabel);
 }
 
 td select {
@@ -170,10 +189,10 @@ td select {
   }
 }
 
-/*versi*/
+/* versi aplikasi */
 .versi-aplikasi {
-    text-align: right;
-    font-size: 12px;
-    color: #888;
-    padding: 8px 15px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--warna-teks-versi);
+  padding: 8px 15px;
 }
