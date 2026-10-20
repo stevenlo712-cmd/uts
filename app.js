@@ -199,7 +199,7 @@ attendanceForm.addEventListener("submit", async (event) => {
     if (error.code === "permission-denied") {
       showMessage(
         attendanceMessage,
-        "Absensi hari ini sudah pernah dikirim atau data tidak diizinkan.",
+        "Absensi hari ini sudah terisi.",
         true
       );
     } else {
