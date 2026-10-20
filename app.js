@@ -98,7 +98,7 @@ function hideAllSections() {
 async function getUserRole(user) {
   const userDoc = await getDoc(doc(db, "users", user.uid));
   if (!userDoc.exists()) {
-    throw new Error("Akun ini belum memiliki dokumen role di Firestore.");
+    throw new Error("Akun ini belum terdaftar.");
   }
   return userDoc.data().role;
 }
