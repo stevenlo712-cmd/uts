@@ -1,10 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 import {
   getFirestore,
   doc,
@@ -14,7 +16,9 @@ import {
   query,
   where,
   onSnapshot,
-  updateDoc
+  updateDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -36,27 +40,36 @@ const loginSection = document.getElementById("loginSection");
 const studentSection = document.getElementById("studentSection");
 const teacherSection = document.getElementById("teacherSection");
 const adminSection = document.getElementById("adminSection");
+
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("loginMessage");
 const logoutButton = document.getElementById("logoutButton");
+
 const attendanceForm = document.getElementById("attendanceForm");
 const attendanceDate = document.getElementById("attendanceDate");
 const attendanceMessage = document.getElementById("attendanceMessage");
 const submitAttendanceButton = document.getElementById("submitAttendanceButton");
+
 const studentHistoryBody = document.getElementById("studentHistoryBody");
 const teacherTableBody = document.getElementById("teacherTableBody");
 const teacherMessage = document.getElementById("teacherMessage");
+
 const adminAccountsBody = document.getElementById("adminAccountsBody");
 const adminSearch = document.getElementById("adminSearch");
 const adminRoleFilter = document.getElementById("adminRoleFilter");
 const adminMessage = document.getElementById("adminMessage");
+const adminLoginLogsBody = document.getElementById("adminLoginLogsBody");
 
 let currentUser = null;
 let currentRole = null;
+
 let unsubscribeAttendance = null;
 let unsubscribeUsers = null;
 let unsubscribeAdminAttendance = null;
+let unsubscribeLoginLogs = null;
+
 let adminAccounts = [];
+let adminLoginLogs = [];
 
 function tanggalWIB() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -68,48 +81,47 @@ function tanggalWIB() {
 }
 
 function showMessage(element, text, isError = false) {
+  if (!element) return;
+
   element.textContent = text;
   element.style.color = isError ? "#b91c1c" : "#166534";
 }
 
 function addCell(row, value) {
   const cell = document.createElement("td");
-  cell.textContent = value || "-";
+  cell.textContent = value ?? "-";
   row.appendChild(cell);
   return cell;
 }
 
 function stopAttendanceListener() {
-  if (unsubscribeAttendance) {
-    unsubscribeAttendance();
-    unsubscribeAttendance = null;
-  }
+  if (unsubscribeAttendance) unsubscribeAttendance();
+  if (unsubscribeUsers) unsubscribeUsers();
+  if (unsubscribeAdminAttendance) unsubscribeAdminAttendance();
+  if (unsubscribeLoginLogs) unsubscribeLoginLogs();
 
-  if (unsubscribeUsers) {
-    unsubscribeUsers();
-    unsubscribeUsers = null;
-  }
-
-  if (unsubscribeAdminAttendance) {
-    unsubscribeAdminAttendance();
-    unsubscribeAdminAttendance = null;
-  }
+  unsubscribeAttendance = null;
+  unsubscribeUsers = null;
+  unsubscribeAdminAttendance = null;
+  unsubscribeLoginLogs = null;
 
   adminAccounts = [];
+  adminLoginLogs = [];
 }
 
 function clearTables() {
-  studentHistoryBody.replaceChildren();
-  teacherTableBody.replaceChildren();
-  adminAccountsBody.replaceChildren();
+  studentHistoryBody?.replaceChildren();
+  teacherTableBody?.replaceChildren();
+  adminAccountsBody?.replaceChildren();
+  adminLoginLogsBody?.replaceChildren();
 }
 
 function hideAllSections() {
-  appHeader.hidden = true;
-  loginSection.hidden = true;
-  studentSection.hidden = true;
-  teacherSection.hidden = true;
-  adminSection.hidden = true;
+  if (appHeader) appHeader.hidden = true;
+  if (loginSection) loginSection.hidden = true;
+  if (studentSection) studentSection.hidden = true;
+  if (teacherSection) teacherSection.hidden = true;
+  if (adminSection) adminSection.hidden = true;
 }
 
 async function getUserRole(user) {
@@ -120,6 +132,18 @@ async function getUserRole(user) {
   }
 
   return userDoc.data().role;
+}
+
+async function catatLogin(user) {
+  try {
+    await addDoc(collection(db, "login_logs"), {
+      uid: user.uid,
+      email: user.email || "",
+      waktu: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Gagal mencatat login:", error);
+  }
 }
 
 loginForm.addEventListener("submit", async (event) => {
@@ -137,14 +161,24 @@ loginForm.addEventListener("submit", async (event) => {
     if (actualRole !== roleSelected) {
       await signOut(auth);
       showMessage(loginMessage, "Role akun tidak sesuai pilihan login.", true);
+      return;
     }
+
+    await catatLogin(result.user);
+    showMessage(loginMessage, "Login berhasil.");
   } catch (error) {
+    console.error("Login gagal:", error);
     showMessage(loginMessage, error.message, true);
   }
 });
 
 logoutButton.addEventListener("click", async () => {
-  await signOut(auth);
+  try {
+    stopAttendanceListener();
+    await signOut(auth);
+  } catch (error) {
+    console.error("Logout gagal:", error);
+  }
 });
 
 onAuthStateChanged(auth, async (user) => {
@@ -154,8 +188,10 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     currentUser = null;
     currentRole = null;
+
     hideAllSections();
-    loginSection.hidden = false;
+
+    if (loginSection) loginSection.hidden = false;
     return;
   }
 
@@ -170,8 +206,11 @@ onAuthStateChanged(auth, async (user) => {
     currentRole = role;
 
     hideAllSections();
-    appHeader.hidden = false;
-    userEmailElement.textContent = user.email || "";
+
+    if (appHeader) appHeader.hidden = false;
+    if (userEmailElement) {
+      userEmailElement.textContent = user.email || "";
+    }
 
     if (role === "siswa") {
       studentSection.hidden = false;
@@ -185,9 +224,12 @@ onAuthStateChanged(auth, async (user) => {
       listenToAdminDashboard();
     }
   } catch (error) {
+    console.error("Gagal memeriksa akun:", error);
     await signOut(auth);
+
     hideAllSections();
-    loginSection.hidden = false;
+    if (loginSection) loginSection.hidden = false;
+
     showMessage(loginMessage, error.message, true);
   }
 });
@@ -195,9 +237,7 @@ onAuthStateChanged(auth, async (user) => {
 attendanceForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  if (!currentUser || currentRole !== "siswa") {
-    return;
-  }
+  if (!currentUser || currentRole !== "siswa") return;
 
   const nama = document.getElementById("studentName").value.trim();
   const kelas = document.getElementById("studentClass").value.trim();
@@ -209,9 +249,17 @@ attendanceForm.addEventListener("submit", async (event) => {
   showMessage(attendanceMessage, "");
 
   try {
-    await setDoc(doc(db, "absensi", attendanceId), {
+    const attendanceRef = doc(db, "absensi", attendanceId);
+    const existing = await getDoc(attendanceRef);
+
+    if (existing.exists()) {
+      showMessage(attendanceMessage, "Absensi hari ini sudah terisi.", true);
+      return;
+    }
+
+    await setDoc(attendanceRef, {
       uid: currentUser.uid,
-      email: currentUser.email,
+      email: currentUser.email || "",
       nama,
       kelas,
       keterangan,
@@ -222,11 +270,8 @@ attendanceForm.addEventListener("submit", async (event) => {
     attendanceForm.reset();
     attendanceDate.value = tanggalWIB();
   } catch (error) {
-    if (error.code === "permission-denied") {
-      showMessage(attendanceMessage, "Absensi hari ini sudah terisi.", true);
-    } else {
-      showMessage(attendanceMessage, error.message, true);
-    }
+    console.error("Gagal menyimpan absensi:", error);
+    showMessage(attendanceMessage, error.message, true);
   } finally {
     submitAttendanceButton.disabled = false;
   }
@@ -242,7 +287,11 @@ function listenToStudentAttendance(user) {
     studentQuery,
     (snapshot) => {
       const records = snapshot.docs.map((item) => item.data());
-      records.sort((a, b) => (b.tanggal || "").localeCompare(a.tanggal || ""));
+
+      records.sort((a, b) =>
+        (b.tanggal || "").localeCompare(a.tanggal || "")
+      );
+
       studentHistoryBody.replaceChildren();
 
       let hadir = 0;
@@ -255,10 +304,12 @@ function listenToStudentAttendance(user) {
         if (record.keterangan === "Izin") izin++;
 
         const row = document.createElement("tr");
+
         addCell(row, record.tanggal);
         addCell(row, record.nama);
         addCell(row, record.kelas);
         addCell(row, record.keterangan);
+
         studentHistoryBody.appendChild(row);
       }
 
@@ -289,7 +340,10 @@ function listenToTeacherAttendance() {
       }
 
       const records = [...uniqueRecords.values()];
-      records.sort((a, b) => (b.tanggal || "").localeCompare(a.tanggal || ""));
+
+      records.sort((a, b) =>
+        (b.tanggal || "").localeCompare(a.tanggal || "")
+      );
 
       teacherTableBody.replaceChildren();
       showMessage(teacherMessage, "");
@@ -321,6 +375,7 @@ function listenToTeacherAttendance() {
             await updateDoc(doc(db, "absensi", record.id), {
               keterangan: reasonSelect.value
             });
+
             showMessage(teacherMessage, "Keterangan berhasil diperbarui.");
           } catch (error) {
             showMessage(teacherMessage, error.message, true);
@@ -341,7 +396,6 @@ function listenToTeacherAttendance() {
   );
 }
 
-/* tambahan dashboard admin */
 function listenToAdminDashboard() {
   unsubscribeUsers = onSnapshot(
     collection(db, "users"),
@@ -351,19 +405,13 @@ function listenToAdminDashboard() {
         ...item.data()
       }));
 
-      document.getElementById("adminTotalAkun").textContent = adminAccounts.length;
-      document.getElementById("adminTotalSiswa").textContent =
-        adminAccounts.filter((account) => account.role === "siswa").length;
-      document.getElementById("adminTotalGuru").textContent =
-        adminAccounts.filter((account) => account.role === "guru").length;
-      document.getElementById("adminTotalAdmin").textContent =
-        adminAccounts.filter((account) => account.role === "admin").length;
-
+      updateAdminAccountStats();
       renderAdminAccounts();
       showMessage(adminMessage, "");
     },
     (error) => {
-      showMessage(adminMessage, "Gagal mengambil data akun: " + error.message, true);
+      console.error("Gagal membaca akun:", error);
+      showMessage(adminMessage, "Gagal mengambil akun: " + error.message, true);
     }
   );
 
@@ -371,6 +419,7 @@ function listenToAdminDashboard() {
     collection(db, "absensi"),
     (snapshot) => {
       const today = tanggalWIB();
+
       let hadir = 0;
       let sakit = 0;
       let izin = 0;
@@ -385,13 +434,78 @@ function listenToAdminDashboard() {
         if (record.keterangan === "Izin") izin++;
       }
 
-      document.getElementById("adminTotalHadir").textContent = hadir;
-      document.getElementById("adminTotalSakit").textContent = sakit;
-      document.getElementById("adminTotalIzin").textContent = izin;
+      setText("adminTotalHadir", hadir);
+      setText("adminTotalSakit", sakit);
+      setText("adminTotalIzin", izin);
     },
     (error) => {
-      showMessage(adminMessage, "Gagal mengambil data absensi: " + error.message, true);
+      console.error("Gagal membaca absensi:", error);
+      showMessage(adminMessage, "Gagal membaca absensi: " + error.message, true);
     }
+  );
+
+  if (adminLoginLogsBody) {
+    unsubscribeLoginLogs = onSnapshot(
+      collection(db, "login_logs"),
+      (snapshot) => {
+        adminLoginLogs = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...item.data()
+        }));
+
+        adminLoginLogs.sort((a, b) => {
+          const waktuA = a.waktu?.toMillis?.() || 0;
+          const waktuB = b.waktu?.toMillis?.() || 0;
+          return waktuB - waktuA;
+        });
+
+        renderLoginLogs();
+      },
+      (error) => {
+        console.error("Gagal membaca riwayat login:", error);
+
+        adminLoginLogsBody.replaceChildren();
+
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 3;
+        cell.textContent = "Riwayat login gagal dimuat. Periksa Firestore Rules.";
+
+        row.appendChild(cell);
+        adminLoginLogsBody.appendChild(row);
+      }
+    );
+  }
+
+  adminSearch.addEventListener("input", renderAdminAccounts);
+  adminRoleFilter.addEventListener("change", renderAdminAccounts);
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function updateAdminAccountStats() {
+  setText("adminTotalAkun", adminAccounts.length);
+
+  setText(
+    "adminTotalSiswa",
+    adminAccounts.filter((account) => account.role === "siswa").length
+  );
+
+  setText(
+    "adminTotalGuru",
+    adminAccounts.filter((account) => account.role === "guru").length
+  );
+
+  setText(
+    "adminTotalAdmin",
+    adminAccounts.filter((account) => account.role === "admin").length
   );
 }
 
@@ -404,7 +518,9 @@ function renderAdminAccounts() {
       const nama = String(account.nama || account.name || "").toLowerCase();
       const email = String(account.email || "").toLowerCase();
 
-      const matchesSearch = nama.includes(keyword) || email.includes(keyword);
+      const matchesSearch =
+        nama.includes(keyword) || email.includes(keyword);
+
       const matchesRole =
         selectedRole === "semua" || account.role === selectedRole;
 
@@ -413,27 +529,11 @@ function renderAdminAccounts() {
     .sort((a, b) => {
       const namaA = String(a.nama || a.name || "");
       const namaB = String(b.nama || b.name || "");
+
       return namaA.localeCompare(namaB, "id");
     });
 
   adminAccountsBody.replaceChildren();
-
-  for (const [index, account] of filteredAccounts.entries()) {
-    const row = document.createElement("tr");
-
-    addCell(row, index + 1);
-    addCell(row, account.nama || account.name || "-");
-    addCell(row, account.email || "-");
-
-    const roleNames = {
-      siswa: "Siswa",
-      guru: "Guru",
-      admin: "Admin"
-    };
-
-    addCell(row, roleNames[account.role] || account.role || "-");
-    adminAccountsBody.appendChild(row);
-  }
 
   if (filteredAccounts.length === 0) {
     const row = document.createElement("tr");
@@ -444,8 +544,63 @@ function renderAdminAccounts() {
 
     row.appendChild(cell);
     adminAccountsBody.appendChild(row);
+    return;
   }
+
+  filteredAccounts.forEach((account, index) => {
+    const row = document.createElement("tr");
+
+    addCell(row, index + 1);
+    addCell(row, account.nama || account.name || "-");
+    addCell(row, account.email || "Email belum tersimpan");
+
+    const roleNames = {
+      siswa: "Siswa",
+      guru: "Guru",
+      admin: "Admin"
+    };
+
+    addCell(row, roleNames[account.role] || account.role || "-");
+
+    adminAccountsBody.appendChild(row);
+  });
 }
 
-adminSearch.addEventListener("input", renderAdminAccounts);
-adminRoleFilter.addEventListener("change", renderAdminAccounts);
+function renderLoginLogs() {
+  if (!adminLoginLogsBody) return;
+
+  adminLoginLogsBody.replaceChildren();
+
+  if (adminLoginLogs.length === 0) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    cell.colSpan = 3;
+    cell.textContent = "Belum ada riwayat login.";
+
+    row.appendChild(cell);
+    adminLoginLogsBody.appendChild(row);
+    return;
+  }
+
+  adminLoginLogs.forEach((log, index) => {
+    const row = document.createElement("tr");
+
+    addCell(row, index + 1);
+    addCell(row, log.email || "Email tidak tersedia");
+
+    let waktu = "Menyimpan waktu...";
+
+    if (log.waktu && typeof log.waktu.toDate === "function") {
+      waktu =
+        log.waktu.toDate().toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          dateStyle: "medium",
+          timeStyle: "short"
+        }) + " WIB";
+    }
+
+    addCell(row, waktu);
+    adminLoginLogsBody.appendChild(row);
+  });
+}
