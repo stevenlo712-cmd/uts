@@ -1,12 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
 import {
   getFirestore,
   doc,
@@ -62,12 +60,10 @@ const adminLoginLogsBody = document.getElementById("adminLoginLogsBody");
 
 let currentUser = null;
 let currentRole = null;
-
 let unsubscribeAttendance = null;
 let unsubscribeUsers = null;
 let unsubscribeAdminAttendance = null;
 let unsubscribeLoginLogs = null;
-
 let adminAccounts = [];
 let adminLoginLogs = [];
 
@@ -160,7 +156,7 @@ loginForm.addEventListener("submit", async (event) => {
 
     if (actualRole !== roleSelected) {
       await signOut(auth);
-      showMessage(loginMessage, "Role akun tidak sesuai pilihan login.", true);
+      showMessage(loginMessage, "Akun tidak diketahui.", true);
       return;
     }
 
@@ -270,7 +266,7 @@ attendanceForm.addEventListener("submit", async (event) => {
     showMessage(
       attendanceMessage,
       error.code === "permission-denied"
-        ? "Absensi ditolak oleh Firestore. Periksa Rules dan data akun."
+        ? "Absensi hari ini sudah terisi."
         : error.message,
       true
     );
