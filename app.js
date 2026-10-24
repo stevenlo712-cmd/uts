@@ -234,48 +234,51 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+
 attendanceForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  if (!currentUser || currentRole !== "siswa") return;
+  if (!currentUser || currentRole !== "siswa") {
+    return;
+  }
 
   const nama = document.getElementById("studentName").value.trim();
   const kelas = document.getElementById("studentClass").value.trim();
   const keterangan = document.getElementById("attendanceReason").value;
   const tanggal = tanggalWIB();
+
   const attendanceId = `${currentUser.uid}_${tanggal}`;
 
   submitAttendanceButton.disabled = true;
   showMessage(attendanceMessage, "");
 
   try {
-    const attendanceRef = doc(db, "absensi", attendanceId);
-    const existing = await getDoc(attendanceRef);
-
-    if (existing.exists()) {
-      showMessage(attendanceMessage, "Absensi hari ini sudah terisi.", true);
-      return;
-    }
-
-    await setDoc(attendanceRef, {
+    await setDoc(doc(db, "absensi", attendanceId), {
       uid: currentUser.uid,
       email: currentUser.email || "",
-      nama,
-      kelas,
-      keterangan,
-      tanggal
+      nama: nama,
+      kelas: kelas,
+      keterangan: keterangan,
+      tanggal: tanggal
     });
 
     showMessage(attendanceMessage, "Absensi berhasil dikirim.");
     attendanceForm.reset();
     attendanceDate.value = tanggalWIB();
   } catch (error) {
-    console.error("Gagal menyimpan absensi:", error);
-    showMessage(attendanceMessage, error.message, true);
+    console.error("Gagal mengirim absensi:", error);
+    showMessage(
+      attendanceMessage,
+      error.code === "permission-denied"
+        ? "Absensi ditolak oleh Firestore. Periksa Rules dan data akun."
+        : error.message,
+      true
+    );
   } finally {
     submitAttendanceButton.disabled = false;
   }
 });
+
 
 function listenToStudentAttendance(user) {
   const studentQuery = query(
