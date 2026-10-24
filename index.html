@@ -9,47 +9,39 @@
 <body>
   <header id="appHeader" class="header" hidden>
     <h1>Sistem Absensi Siswa</h1>
-
     <div class="user-info">
       <span id="userEmail"></span>
-      <button id="logoutButton" type="button" class="button button-secondary">
-        Keluar
-      </button>
+      <button id="logoutButton" type="button" class="button button-secondary">Keluar</button>
     </div>
   </header>
 
-  <!--versi-->
   <div class="versi-aplikasi">v1.0</div>
 
   <main class="container">
     <section id="loginSection" class="card">
       <h2>Login</h2>
-
       <form id="loginForm">
         <label for="loginRole">Login sebagai</label>
         <select id="loginRole" required>
           <option value="siswa">Siswa</option>
           <option value="guru">Guru</option>
+          <option value="admin">Admin</option>
         </select>
 
-        <label for="loginEmail" >Email</label>
-        <input id="loginEmail" type="email" autocomplete="email"  placeholder="Masukan email." required >
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="Masukan email." required>
 
         <label for="loginPassword">Password</label>
-        <input
-          id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukan password."
-        >
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukan password.">
 
         <button type="submit" class="button">Login</button>
       </form>
-
       <p id="loginMessage" class="message"></p>
     </section>
 
     <section id="studentSection" hidden>
       <div class="card">
         <h2>Form Absensi</h2>
-
         <form id="attendanceForm">
           <label for="attendanceDate">Tanggal</label>
           <input id="attendanceDate" type="date" readonly>
@@ -68,17 +60,13 @@
             <option value="Izin">Izin</option>
           </select>
 
-          <button id="submitAttendanceButton" type="submit" class="button">
-            Kirim Absensi
-          </button>
+          <button id="submitAttendanceButton" type="submit" class="button">Kirim Absensi</button>
         </form>
-
         <p id="attendanceMessage" class="message"></p>
       </div>
 
       <div class="card">
         <h2>Ringkasan Absensi</h2>
-
         <div class="summary">
           <div>Hadir: <strong id="countHadir">0</strong></div>
           <div>Sakit: <strong id="countSakit">0</strong></div>
@@ -89,7 +77,6 @@
 
       <div class="card">
         <h2>Riwayat Absensi Saya</h2>
-
         <div class="table-wrap">
           <table>
             <thead>
@@ -109,7 +96,6 @@
     <section id="teacherSection" hidden>
       <div class="card">
         <h2>Data Absensi Siswa</h2>
-
         <div class="table-wrap">
           <table>
             <thead>
@@ -124,8 +110,50 @@
             <tbody id="teacherTableBody"></tbody>
           </table>
         </div>
-
         <p id="teacherMessage" class="message"></p>
+      </div>
+    </section>
+
+    <section id="adminSection" hidden>
+      <div class="card">
+        <h2>Dashboard Admin</h2>
+        <div class="admin-stats">
+          <div class="admin-stat"><span>Total Akun</span><strong id="adminTotalAkun">0</strong></div>
+          <div class="admin-stat"><span>Total Siswa</span><strong id="adminTotalSiswa">0</strong></div>
+          <div class="admin-stat"><span>Total Guru</span><strong id="adminTotalGuru">0</strong></div>
+          <div class="admin-stat"><span>Total Admin</span><strong id="adminTotalAdmin">0</strong></div>
+          <div class="admin-stat"><span>Hadir Hari Ini</span><strong id="adminTotalHadir">0</strong></div>
+          <div class="admin-stat"><span>Sakit Hari Ini</span><strong id="adminTotalSakit">0</strong></div>
+          <div class="admin-stat"><span>Izin Hari Ini</span><strong id="adminTotalIzin">0</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Daftar Seluruh Akun</h2>
+        <div class="admin-filters">
+          <input id="adminSearch" type="search" placeholder="Cari nama atau email...">
+          <select id="adminRoleFilter">
+            <option value="semua">Semua Role</option>
+            <option value="siswa">Siswa</option>
+            <option value="guru">Guru</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody id="adminAccountsBody"></tbody>
+          </table>
+        </div>
+        <p id="adminMessage" class="message"></p>
       </div>
     </section>
   </main>
