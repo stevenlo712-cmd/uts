@@ -3,55 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
   <link rel="icon" href="maskot.png">
-  <title>Sistem Absensi Siswa</title>
+  <title>SAS</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header id="appHeader" class="header" hidden>
     <h1>Sistem Absensi Siswa</h1>
+
     <div class="user-info">
       <span id="userEmail"></span>
-      <button id="logoutButton" type="button" class="button button-secondary">Keluar</button>
+      <button id="logoutButton" type="button" class="button button-secondary">
+        Keluar
+      </button>
     </div>
   </header>
 
-  <div class="versi-aplikasi">v1.1</div>
+  <div class="versi-aplikasi">v1.2</div>
 
   <main class="container">
+
+    <!-- login -->
     <section id="loginSection" class="card">
       <h2>Login</h2>
+
       <form id="loginForm">
-        <label for="loginRole">Login sebagai</label>
-        <select id="loginRole" required>
-          <option value="siswa">Siswa</option>
+        <label>Login sebagai</label>
+
+        <div class="role-options">
+          <button
+            type="button"
+            class="role-option active"
+            data-role="siswa"
+            aria-pressed="true"
+          >
+            <span class="role-icon" aria-hidden="true">♙</span>
+            <span class="role-details">
+              <strong>Siswa</strong>
+            </span>
+            <span class="role-check" aria-hidden="true">✓</span>
+          </button>
+
+          <button
+            type="button"
+            class="role-option"
+            data-role="guru"
+            aria-pressed="false"
+          >
+            <span class="role-icon" aria-hidden="true">♧</span>
+            <span class="role-details">
+              <strong>Guru</strong>
+            </span>
+            <span class="role-check" aria-hidden="true">✓</span>
+          </button>
+
+          <button
+            type="button"
+            class="role-option"
+            data-role="admin"
+            aria-pressed="false"
+          >
+            <span class="role-icon" aria-hidden="true">⚙</span>
+            <span class="role-details">
+              <strong>Admin</strong>
+            </span>
+            <span class="role-check" aria-hidden="true">✓</span>
+          </button>
+        </div>
+
+        <select id="loginRole" required hidden>
+          <option value="siswa" selected>Siswa</option>
           <option value="guru">Guru</option>
           <option value="admin">Admin</option>
         </select>
 
         <label for="loginEmail">Email</label>
-        <input id="loginEmail" type="email" autocomplete="email" placeholder="Masukan email." required>
+        <input
+          id="loginEmail"
+          type="email"
+          autocomplete="username"
+          placeholder="Masukkan email"
+          required
+        >
 
         <label for="loginPassword">Password</label>
-        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Masukan password.">
+        <input
+          id="loginPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Masukkan password"
+          required
+        >
 
-        <button type="submit" class="button">Login</button>
+        <button id="loginButton" type="submit" class="button">
+          Login
+        </button>
       </form>
-      <p id="loginMessage" class="message"></p>
+
+      <p id="loginMessage" class="message" role="status" aria-live="polite"></p>
     </section>
 
+    <!-- halaman siswa -->
     <section id="studentSection" hidden>
       <div class="card">
         <h2>Form Absensi</h2>
+
         <form id="attendanceForm">
           <label for="attendanceDate">Tanggal</label>
           <input id="attendanceDate" type="date" readonly>
 
           <label for="studentName">Nama</label>
-          <input id="studentName" type="text" maxlength="100" required placeholder="Masukan nama kamu.">
+          <input
+            id="studentName"
+            type="text"
+            maxlength="100"
+            required
+            placeholder="Masukkan nama kamu"
+          >
 
           <label for="studentClass">Kelas</label>
-          <input id="studentClass" type="text" maxlength="50" required placeholder="Masukan kelas kamu.">
+          <input
+            id="studentClass"
+            type="text"
+            maxlength="50"
+            required
+            placeholder="Masukkan kelas kamu"
+          >
 
           <label for="attendanceReason">Keterangan</label>
           <select id="attendanceReason" required>
@@ -61,13 +139,17 @@
             <option value="Izin">Izin</option>
           </select>
 
-          <button id="submitAttendanceButton" type="submit" class="button">Kirim Absensi</button>
+          <button id="submitAttendanceButton" type="submit" class="button">
+            Kirim Absensi
+          </button>
         </form>
-        <p id="attendanceMessage" class="message"></p>
+
+        <p id="attendanceMessage" class="message" role="status" aria-live="polite"></p>
       </div>
 
       <div class="card">
         <h2>Ringkasan Absensi</h2>
+
         <div class="summary">
           <div>Hadir: <strong id="countHadir">0</strong></div>
           <div>Sakit: <strong id="countSakit">0</strong></div>
@@ -78,6 +160,7 @@
 
       <div class="card">
         <h2>Riwayat Absensi Saya</h2>
+
         <div class="table-wrap">
           <table>
             <thead>
@@ -94,9 +177,11 @@
       </div>
     </section>
 
+    <!-- halaman guru -->
     <section id="teacherSection" hidden>
       <div class="card">
         <h2>Data Absensi Siswa</h2>
+
         <div class="table-wrap">
           <table>
             <thead>
@@ -111,29 +196,66 @@
             <tbody id="teacherTableBody"></tbody>
           </table>
         </div>
-        <p id="teacherMessage" class="message"></p>
+
+        <p id="teacherMessage" class="message" role="status" aria-live="polite"></p>
       </div>
     </section>
 
+    <!-- halaman admin -->
     <section id="adminSection" hidden>
       <div class="card">
         <h2>Dashboard Admin</h2>
+
         <div class="admin-stats">
-          <div class="admin-stat"><span>Total Akun</span><strong id="adminTotalAkun">0</strong></div>
-          <div class="admin-stat"><span>Total Siswa</span><strong id="adminTotalSiswa">0</strong></div>
-          <div class="admin-stat"><span>Total Guru</span><strong id="adminTotalGuru">0</strong></div>
-          <div class="admin-stat"><span>Total Admin</span><strong id="adminTotalAdmin">0</strong></div>
-          <div class="admin-stat"><span>Hadir Hari Ini</span><strong id="adminTotalHadir">0</strong></div>
-          <div class="admin-stat"><span>Sakit Hari Ini</span><strong id="adminTotalSakit">0</strong></div>
-          <div class="admin-stat"><span>Izin Hari Ini</span><strong id="adminTotalIzin">0</strong></div>
+          <div class="admin-stat">
+            <span>Total Akun</span>
+            <strong id="adminTotalAkun">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <span>Total Siswa</span>
+            <strong id="adminTotalSiswa">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <span>Total Guru</span>
+            <strong id="adminTotalGuru">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <span>Total Admin</span>
+            <strong id="adminTotalAdmin">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <span>Hadir Hari Ini</span>
+            <strong id="adminTotalHadir">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <span>Sakit Hari Ini</span>
+            <strong id="adminTotalSakit">0</strong>
+          </div>
+
+          <div class="admin-stat">
+            <span>Izin Hari Ini</span>
+            <strong id="adminTotalIzin">0</strong>
+          </div>
         </div>
       </div>
 
       <div class="card">
         <h2>Daftar Seluruh Akun</h2>
+
         <div class="admin-filters">
-          <input id="adminSearch" type="search" placeholder="Cari nama atau email...">
-          <select id="adminRoleFilter">
+          <input
+            id="adminSearch"
+            type="search"
+            placeholder="Cari nama atau email..."
+            aria-label="Cari nama atau email akun"
+          >
+
+          <select id="adminRoleFilter" aria-label="Filter role akun">
             <option value="semua">Semua Role</option>
             <option value="siswa">Siswa</option>
             <option value="guru">Guru</option>
@@ -154,11 +276,11 @@
             <tbody id="adminAccountsBody"></tbody>
           </table>
         </div>
-        <p id="adminMessage" class="message"></p>
+
+        <p id="adminMessage" class="message" role="status" aria-live="polite"></p>
       </div>
     </section>
   </main>
-
   <script type="module" src="app.js"></script>
 </body>
 </html>
